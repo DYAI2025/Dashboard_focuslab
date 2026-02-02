@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ProjectModule } from '../types';
 
@@ -46,7 +45,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
       onKeyDown={handleKeyDown}
       style={{ willChange: 'transform, box-shadow' }}
     >
-      {/* 1. SCHEMATIC LAYER */}
+      {/* 1. SCHEMATIC LAYER (HUD Overlay inside card) */}
       <div className={`absolute inset-0 z-0 pointer-events-none transition-all duration-1000 ${isInteractionActive ? 'opacity-40 scale-105 rotate-1' : 'opacity-10 scale-100'}`}>
         <svg className="w-full h-full" viewBox="0 0 400 600">
           <defs>
@@ -57,6 +56,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
           <rect width="100%" height="100%" fill={`url(#hex-grid-${project.id})`} />
           <g fill="none" stroke="currentColor" strokeWidth="0.5" className="text-cyan-400">
             <circle cx="200" cy="220" r="160" strokeDasharray="1 10" className="animate-orbit-slow origin-center" />
+            <circle cx="200" cy="220" r="180" strokeDasharray="4 20" className="animate-orbit origin-center" />
           </g>
         </svg>
       </div>
@@ -74,25 +74,44 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
             transform: isInteractionActive ? 'translateY(-240px)' : 'translateY(0)',
           }}
         >
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-[10px] font-mono font-bold text-cyan-600 bg-cyan-50/80 px-2 py-0.5 border border-cyan-100/50 shadow-sm backdrop-blur-sm">MOD_{formData.id}</span>
-            <div className={`h-[1px] transition-all duration-700 bg-slate-200 ${isInteractionActive ? 'w-24 bg-cyan-400' : 'w-10'}`} />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-mono font-bold text-cyan-600 bg-cyan-50/80 px-2 py-0.5 border border-cyan-100/50 shadow-sm backdrop-blur-sm uppercase">MOD_{formData.id}</span>
+              <div className={`h-[1px] transition-all duration-700 bg-slate-200 ${isInteractionActive ? 'w-24 bg-cyan-400' : 'w-10'}`} />
+            </div>
+            
+            {/* Edit Mode Toggle Button */}
+            {!isEditing && (
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2 px-3 py-1 glass-panel border border-slate-200 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-600 hover:border-cyan-400 transition-all opacity-0 group-hover:opacity-100"
+              >
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                INIT_EDIT_MODE
+              </button>
+            )}
           </div>
           
           {isEditing ? (
-            <div className="space-y-4">
-              <input 
-                value={formData.title}
-                onChange={e => setFormData({ ...formData, title: e.target.value })}
-                className="w-full text-3xl font-bold tracking-tighter text-slate-900 bg-white border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-cyan-400 outline-none"
-                placeholder="Module Title"
-              />
-              <textarea 
-                value={formData.description}
-                onChange={e => setFormData({ ...formData, description: e.target.value })}
-                className="w-full text-xs text-slate-500 bg-white border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-cyan-400 outline-none resize-none h-20"
-                placeholder="Description"
-              />
+            <div className="space-y-6">
+              <div className="relative">
+                <span className="absolute -top-2 left-2 px-1 bg-white text-[7px] font-mono text-cyan-600 font-bold tracking-[0.2em] z-10">MOD_TITLE_ENTRY</span>
+                <input 
+                  value={formData.title}
+                  onChange={e => setFormData({ ...formData, title: e.target.value })}
+                  className="w-full text-2xl font-bold tracking-tighter text-slate-900 bg-white/80 border border-slate-200 px-3 py-3 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 outline-none transition-all"
+                  placeholder="Module Title"
+                />
+              </div>
+              <div className="relative">
+                <span className="absolute -top-2 left-2 px-1 bg-white text-[7px] font-mono text-cyan-600 font-bold tracking-[0.2em] z-10">DESCRIPTION_STREAM</span>
+                <textarea 
+                  value={formData.description}
+                  onChange={e => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full text-[11px] font-mono text-slate-600 bg-white/80 border border-slate-200 px-3 py-3 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 outline-none resize-none h-24 leading-relaxed transition-all"
+                  placeholder="Enter technical specifications..."
+                />
+              </div>
             </div>
           ) : (
             <>
@@ -112,7 +131,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
         <div 
           className="absolute bottom-0 left-0 w-full glass-panel border-t border-slate-200 p-8 transform transition-all overflow-hidden"
           style={{ 
-            height: '66%',
+            height: '74%',
             transitionDuration: '850ms',
             transitionTimingFunction: techEasing,
             transform: isInteractionActive ? 'translateY(0)' : 'translateY(100%)',
@@ -121,38 +140,60 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
           <div className={`absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent ${isInteractionActive ? 'animate-pulse' : ''}`} />
           
           <div className="flex flex-col h-full">
-            <div className={`flex justify-between items-start mb-6 transition-all duration-700 ${isInteractionActive ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+            <div className={`grid grid-cols-2 gap-4 mb-6 transition-all duration-700 ${isInteractionActive ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
               <div className="flex flex-col gap-1">
                 <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-[0.3em]">Deployment_Analysis</span>
                 {isEditing ? (
-                  <input 
-                    value={formData.logChannel}
-                    onChange={e => setFormData({ ...formData, logChannel: e.target.value })}
-                    className="text-[10px] font-mono text-cyan-600 bg-white border border-slate-200 px-2 py-0.5 outline-none"
-                    placeholder="Log Channel ID"
-                  />
+                  <div className="relative mt-1">
+                    <span className="absolute -top-1.5 left-1 px-1 bg-white text-[5px] font-mono text-slate-400 font-bold z-10 uppercase">CHANNEL_ID</span>
+                    <input 
+                      value={formData.logChannel}
+                      onChange={e => setFormData({ ...formData, logChannel: e.target.value })}
+                      className="w-full text-[10px] font-mono text-cyan-600 bg-white border border-slate-200 px-2 py-1 outline-none focus:border-cyan-400"
+                      placeholder="LOG_CHANNEL_01"
+                    />
+                  </div>
                 ) : (
                   <span className="text-[7px] font-mono text-cyan-500 font-black uppercase tracking-widest">Active_Node_Sync: {formData.logChannel || 'Established'}</span>
                 )}
               </div>
-              <button 
-                onClick={() => !isEditing && setIsEditing(true)}
-                className={`p-2 transition-colors ${isEditing ? 'hidden' : 'hover:text-cyan-600 text-slate-400'}`}
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              </button>
+              
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-[0.3em]">Lifecycle_Protocol</span>
+                {isEditing ? (
+                  <div className="relative mt-1">
+                    <span className="absolute -top-1.5 left-1 px-1 bg-white text-[5px] font-mono text-slate-400 font-bold z-10 uppercase">STATUS_SELECT</span>
+                    <select 
+                      value={formData.status}
+                      onChange={e => setFormData({ ...formData, status: e.target.value as any })}
+                      className="w-full text-[10px] font-mono font-bold text-slate-700 bg-white border border-slate-200 px-2 py-1 outline-none focus:border-cyan-400 appearance-none cursor-pointer"
+                    >
+                      <option value="ACTIVE">ACTIVE</option>
+                      <option value="STABLE">STABLE</option>
+                      <option value="ARCHIVED">ARCHIVED</option>
+                    </select>
+                  </div>
+                ) : (
+                  <span className={`text-[7px] font-mono font-black uppercase tracking-widest ${formData.status === 'ACTIVE' ? 'text-green-500' : formData.status === 'STABLE' ? 'text-cyan-500' : 'text-slate-400'}`}>
+                    Current_State: {formData.status}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className={`grid grid-cols-2 gap-8 mb-6 transition-all duration-700 ${isInteractionActive ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`} style={{ transitionDelay: '150ms' }}>
               <div className="space-y-3">
                 <span className="text-[9px] font-mono text-slate-400 uppercase block tracking-widest">Tags::Core</span>
                 {isEditing ? (
-                  <input 
-                    value={formData.tags.join(', ')}
-                    onChange={e => setFormData({ ...formData, tags: e.target.value.split(',').map(t => t.trim()) })}
-                    className="w-full text-[9px] font-mono text-slate-600 bg-white border border-slate-200 px-2 py-1 outline-none"
-                    placeholder="Tag1, Tag2..."
-                  />
+                  <div className="relative">
+                    <span className="absolute -top-1.5 left-1 px-1 bg-white text-[5px] font-mono text-slate-400 font-bold z-10 uppercase">METADATA_ARRAY</span>
+                    <input 
+                      value={formData.tags.join(', ')}
+                      onChange={e => setFormData({ ...formData, tags: e.target.value.split(',').map(t => t.trim()) })}
+                      className="w-full text-[9px] font-mono text-slate-600 bg-white border border-slate-200 px-2 py-2 outline-none focus:border-cyan-400"
+                      placeholder="Tag1, Tag2..."
+                    />
+                  </div>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {formData.tags.map(tag => (
@@ -165,13 +206,18 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                 <span className="text-[9px] font-mono text-slate-400 uppercase block tracking-widest">Metric::Stability</span>
                 <div className="relative h-6 w-full flex items-center">
                   {isEditing ? (
-                    <input 
-                      type="number"
-                      value={formData.stability}
-                      onChange={e => setFormData({ ...formData, stability: parseFloat(e.target.value) })}
-                      className="w-full text-[9px] font-mono text-cyan-600 bg-white border border-slate-200 px-2 py-1 outline-none"
-                      max="100" min="0" step="0.1"
-                    />
+                    <div className="relative w-full">
+                      <input 
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={formData.stability}
+                        onChange={e => setFormData({ ...formData, stability: parseFloat(e.target.value) })}
+                        className="w-full accent-cyan-500 h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                      />
+                      <span className="absolute -top-4 right-0 text-[7px] font-mono text-cyan-600">{formData.stability}%</span>
+                    </div>
                   ) : (
                     <>
                       <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -184,33 +230,35 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
               </div>
             </div>
 
+            {/* Technical Log Preview */}
             <div className={`flex-1 border border-slate-200 p-4 bg-slate-50/80 relative overflow-hidden mb-6 transition-all duration-700 ${isInteractionActive ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`} style={{ transitionDelay: '300ms' }}>
               <div className="h-full flex flex-col gap-1 font-mono text-[7px] text-slate-400">
                 <div className="flex justify-between border-b border-slate-200 pb-1 mb-1">
                   <span className="text-cyan-600 font-bold">{formData.logChannel || 'SYS_LOG'}</span>
-                  <span className="text-[6px]">T_STAMP: 2025.04.12.A</span>
+                  <span className="text-[6px]">T_STAMP: {new Date().toISOString().split('T')[0].replace(/-/g, '.')}</span>
                 </div>
                 <div className="animate-pulse">>> INITIATING HANDSHAKE... [OK]</div>
-                <div>>> BUFFER_SIZE: 1024KB / SYNC: ACTIVE</div>
+                <div>>> BUFFER_SIZE: 1024KB / SYNC: {formData.status === 'ACTIVE' ? 'ACTIVE' : 'IDLE'}</div>
                 <div className="text-cyan-600">>> ENCRYPTION_LAYER: 0xF42A-SECURE</div>
+                {isEditing && (
+                  <div className="text-amber-500 animate-pulse mt-1">>> SYSTEM_CONFIGURATION_OVERRIDE_ACTIVE</div>
+                )}
               </div>
             </div>
 
+            {/* Action Buttons */}
             <div className={`flex gap-3 transition-all duration-700 ${isInteractionActive ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`} style={{ transitionDelay: '450ms' }}>
               {isEditing ? (
                 <>
-                  <button onClick={handleSave} className="flex-1 py-3 bg-cyan-600 text-white text-[10px] font-mono font-bold tracking-[0.4em] hover:bg-cyan-700 transition-all">COMMIT_CHANGES</button>
+                  <button onClick={handleSave} className="flex-1 py-3 bg-cyan-600 text-white text-[10px] font-mono font-bold tracking-[0.4em] hover:bg-cyan-700 transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)]">COMMIT_CHANGES</button>
                   <button onClick={handleCancel} className="flex-1 py-3 bg-slate-200 text-slate-600 text-[10px] font-mono font-bold tracking-[0.4em] hover:bg-slate-300 transition-all">ABORT_SYNC</button>
                 </>
               ) : (
                 <>
-                  <a href={formData.repoUrl} className="group/btn relative flex-1 py-3 bg-slate-900 text-white text-[10px] font-mono font-bold text-center tracking-[0.4em] hover:bg-cyan-600 transition-all overflow-hidden flex items-center justify-center gap-2">
+                  <a href={formData.repoUrl} className="group/btn relative flex-1 py-3 bg-slate-900 text-white text-[10px] font-mono font-bold text-center tracking-[0.4em] hover:bg-cyan-600 transition-all overflow-hidden flex items-center justify-center gap-2 shadow-lg">
                     <span className="relative z-10">OPEN_INTERFACE</span>
                     <svg className="w-3 h-3 relative z-10 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                   </a>
-                  <button onClick={() => setIsEditing(true)} className="w-12 h-11 flex items-center justify-center border border-slate-200 hover:bg-white hover:border-cyan-400 transition-all shadow-sm">
-                    <svg className="w-4 h-4 text-slate-400 hover:text-cyan-500 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  </button>
                 </>
               )}
             </div>
