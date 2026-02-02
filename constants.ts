@@ -1,7 +1,7 @@
 
 import { ProjectModule, Principle } from './types';
 
-export const PROJECTS: ProjectModule[] = [
+export const PROJECTS_DATA: ProjectModule[] = [
   {
     id: '01',
     title: 'Neural Suture',
@@ -10,7 +10,9 @@ export const PROJECTS: ProjectModule[] = [
     tags: ['N-Bridge', 'Latency < 1ms', 'Ethical Core'],
     imageUrl: 'https://picsum.photos/seed/n1/800/600',
     repoUrl: '#',
-    detailsUrl: '#'
+    detailsUrl: '#',
+    stability: 86.4,
+    logChannel: 'LOG_CHANNEL_01'
   },
   {
     id: '02',
@@ -20,7 +22,9 @@ export const PROJECTS: ProjectModule[] = [
     tags: ['Logic-Vis', 'GPT-7 Ready', 'HUD-Sync'],
     imageUrl: 'https://picsum.photos/seed/n2/800/600',
     repoUrl: '#',
-    detailsUrl: '#'
+    detailsUrl: '#',
+    stability: 94.2,
+    logChannel: 'COGNITIVE_SYNC'
   },
   {
     id: '03',
@@ -30,7 +34,9 @@ export const PROJECTS: ProjectModule[] = [
     tags: ['IOT-Mesh', 'Edge-AI', 'Zero-Trust'],
     imageUrl: 'https://picsum.photos/seed/n3/800/600',
     repoUrl: '#',
-    detailsUrl: '#'
+    detailsUrl: '#',
+    stability: 72.8,
+    logChannel: 'AMBIENT_NET'
   },
   {
     id: '04',
@@ -40,7 +46,9 @@ export const PROJECTS: ProjectModule[] = [
     tags: ['UI-Gen', 'UX-Bio', 'Legacy'],
     imageUrl: 'https://picsum.photos/seed/n4/800/600',
     repoUrl: '#',
-    detailsUrl: '#'
+    detailsUrl: '#',
+    stability: 99.9,
+    logChannel: 'UI_GEN_BUFFER'
   }
 ];
 

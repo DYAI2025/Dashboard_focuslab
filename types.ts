@@ -8,6 +8,8 @@ export interface ProjectModule {
   imageUrl: string;
   repoUrl: string;
   detailsUrl: string;
+  stability?: number;
+  logChannel?: string;
 }
 
 export interface Principle {

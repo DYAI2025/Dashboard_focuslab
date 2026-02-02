@@ -1,13 +1,17 @@
 
 import React from 'react';
-import { PROJECTS } from '../constants';
+import { ProjectModule } from '../types';
 
-const CoreMotif: React.FC = () => {
-  const activeModules = PROJECTS.filter(p => p.status === 'ACTIVE').length;
-  const totalModules = PROJECTS.length;
-  const activationRatio = activeModules / totalModules;
+interface CoreMotifProps {
+  projects: ProjectModule[];
+}
+
+const CoreMotif: React.FC<CoreMotifProps> = ({ projects }) => {
+  const activeModules = projects.filter(p => p.status === 'ACTIVE').length;
+  const totalModules = projects.length;
+  const activationRatio = totalModules > 0 ? activeModules / totalModules : 0;
   
-  // Dynamic status based on activity
+  // Dynamic status based on activity - Now correctly initialized
   const statusLabel = activationRatio > 0.6 ? 'OPTIMAL' : activationRatio > 0.3 ? 'NOMINAL' : 'LOW_POWER';
   const coreGlowColor = activationRatio > 0.3 ? 'rgba(34, 211, 238, 0.4)' : 'rgba(245, 158, 11, 0.4)';
 
@@ -48,17 +52,19 @@ const CoreMotif: React.FC = () => {
           <span className="text-slate-500 font-mono text-[8px] tracking-[0.4em] mb-1 font-bold">REACTION_CHAMBER</span>
           <div className={`w-20 h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent mb-3 transition-opacity duration-1000 ${activationRatio > 0.3 ? 'opacity-100' : 'opacity-30'}`} />
           
-          {/* Animated Bars - Synchronized with PROJECT Data */}
+          {/* Animated Bars - Synchronized with current projects state */}
           <div className="flex items-end gap-1.5 h-10 mb-2">
-            {PROJECTS.map((project, i) => {
+            {projects.map((project) => {
               const isActive = project.status === 'ACTIVE';
+              // Base height on stability if available, else random for visual flair
+              const stabilityFactor = project.stability ? project.stability / 100 : 0.5;
               return (
                 <div 
                   key={project.id} 
                   className={`w-1.5 rounded-t-sm transition-all duration-1000 ${isActive ? 'bg-cyan-500 shadow-[0_0_10px_rgba(34,211,238,0.5)]' : 'bg-slate-300'}`} 
                   style={{ 
-                    height: isActive ? `${60 + Math.random() * 40}%` : `${20 + Math.random() * 20}%`,
-                    animation: isActive ? `pulse ${1 + Math.random()}s infinite alternate` : 'none',
+                    height: isActive ? `${40 + (stabilityFactor * 60)}%` : `${10 + (stabilityFactor * 20)}%`,
+                    animation: isActive ? `pulse ${1 + (1 - stabilityFactor)}s infinite alternate` : 'none',
                     opacity: isActive ? 1 : 0.4
                   }} 
                 />
