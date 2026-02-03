@@ -41,7 +41,7 @@ const App: React.FC = () => {
           <div className="flex items-center gap-12">
             <div className="relative group/logo cursor-pointer">
               <div className="flex flex-col">
-                <span className="text-2xl font-bold tracking-[0.25em] text-slate-900 group-hover/logo:text-cyan-600 transition-colors">DYAI</span>
+                <span className="text-2xl font-bold tracking-[0.25em] text-slate-900 group-hover/logo:text-cyan-600 transition-colors group-hover/logo:animate-[glitch-text_0.4s_infinite]">DYAI</span>
                 <span className="text-[8px] font-mono text-cyan-600/60 font-bold -mt-1 tracking-[0.4em] uppercase">SYSTEMS_DIVISION</span>
               </div>
               <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-6 bg-cyan-400 rounded-full group-hover/logo:h-8 transition-all" />

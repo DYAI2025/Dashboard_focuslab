@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProjectModule } from '../types';
 
 interface ModuleCardProps {
@@ -10,10 +10,22 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<ProjectModule>({ ...project });
+  const [formData, setFormData] = useState<ProjectModule>(project);
+
+  // Sync state with props when not editing to prevent stale data
+  useEffect(() => {
+    if (!isEditing) {
+      setFormData(project);
+    }
+  }, [project, isEditing]);
 
   const isInteractionActive = isHovered || isFocused || isEditing;
   const techEasing = 'cubic-bezier(0.23, 1, 0.32, 1)';
+
+  const handleEditToggle = () => {
+    setFormData({ ...project });
+    setIsEditing(true);
+  };
 
   const handleSave = () => {
     onUpdate(formData);
@@ -80,14 +92,13 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
               <div className={`h-[1px] transition-all duration-700 bg-slate-200 ${isInteractionActive ? 'w-24 bg-cyan-400' : 'w-10'}`} />
             </div>
             
-            {/* Edit Mode Toggle Button */}
             {!isEditing && (
               <button 
-                onClick={() => setIsEditing(true)}
+                onClick={handleEditToggle}
                 className="flex items-center gap-2 px-3 py-1 glass-panel border border-slate-200 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-600 hover:border-cyan-400 transition-all opacity-0 group-hover:opacity-100"
               >
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                INIT_EDIT_MODE
+                EDIT_MODE
               </button>
             )}
           </div>
@@ -99,18 +110,38 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                 <input 
                   value={formData.title}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full text-2xl font-bold tracking-tighter text-slate-900 bg-white/80 border border-slate-200 px-3 py-3 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 outline-none transition-all"
+                  className="w-full text-2xl font-bold tracking-tighter text-slate-900 bg-white/80 border border-slate-200 px-3 py-3 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 outline-none transition-all shadow-sm placeholder:text-slate-300"
                   placeholder="Module Title"
                 />
               </div>
+              
               <div className="relative">
                 <span className="absolute -top-2 left-2 px-1 bg-white text-[7px] font-mono text-cyan-600 font-bold tracking-[0.2em] z-10">DESCRIPTION_STREAM</span>
-                <textarea 
-                  value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full text-[11px] font-mono text-slate-600 bg-white/80 border border-slate-200 px-3 py-3 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 outline-none resize-none h-24 leading-relaxed transition-all"
-                  placeholder="Enter technical specifications..."
-                />
+                <div className="flex bg-white/90 border border-slate-200 focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-400/10 transition-all shadow-sm overflow-hidden group/textarea">
+                  {/* Pseudo Line Numbers with interactive state */}
+                  <div className="w-10 bg-slate-50 border-r border-slate-100 flex flex-col items-center pt-3 gap-1 select-none pointer-events-none group-focus-within/textarea:bg-cyan-50/30 transition-colors duration-300">
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <span key={n} className="text-[7px] font-mono text-slate-300 group-focus-within/textarea:text-cyan-400/70 transition-colors">0{n}</span>
+                    ))}
+                  </div>
+                  
+                  <div className="relative flex-1">
+                    <textarea 
+                      value={formData.description}
+                      onChange={e => setFormData({ ...formData, description: e.target.value })}
+                      className="w-full text-[11px] font-mono text-slate-600 bg-transparent px-3 py-3 outline-none resize-none h-32 leading-relaxed block placeholder:text-slate-300"
+                      placeholder="Enter technical specifications..."
+                    />
+                    {/* Background Grid for Textarea */}
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.05] bg-[radial-gradient(#94a3b8_0.5px,transparent_0.5px)] [background-size:10px_10px]" />
+                  </div>
+                </div>
+                
+                {/* Character Parity Monitor */}
+                <div className="mt-1 flex justify-between px-2">
+                  <span className="text-[6px] font-mono text-slate-400 uppercase tracking-widest">Parity_Check: OK</span>
+                  <span className="text-[6px] font-mono text-cyan-600 font-bold uppercase tracking-widest">Length: {formData.description.length} / 512_OCTETS</span>
+                </div>
               </div>
             </div>
           ) : (
@@ -149,7 +180,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                     <input 
                       value={formData.logChannel}
                       onChange={e => setFormData({ ...formData, logChannel: e.target.value })}
-                      className="w-full text-[10px] font-mono text-cyan-600 bg-white border border-slate-200 px-2 py-1 outline-none focus:border-cyan-400"
+                      className="w-full text-[10px] font-mono text-cyan-600 bg-white border border-slate-200 px-2 py-1 outline-none focus:border-cyan-400 placeholder:text-slate-300"
                       placeholder="LOG_CHANNEL_01"
                     />
                   </div>
@@ -190,7 +221,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                     <input 
                       value={formData.tags.join(', ')}
                       onChange={e => setFormData({ ...formData, tags: e.target.value.split(',').map(t => t.trim()) })}
-                      className="w-full text-[9px] font-mono text-slate-600 bg-white border border-slate-200 px-2 py-2 outline-none focus:border-cyan-400"
+                      className="w-full text-[9px] font-mono text-slate-600 bg-white border border-slate-200 px-2 py-2 outline-none focus:border-cyan-400 placeholder:text-slate-300"
                       placeholder="Tag1, Tag2..."
                     />
                   </div>
