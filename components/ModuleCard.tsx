@@ -43,14 +43,17 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
     setIsGenerating(true);
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-      const prompt = `Rewrite the following description to be more technical, sci-fi, and cryptic, fitting a high-tech lab interface. Use jargon, abbreviations, and keeping it under 200 characters.
+      const prompt = `Rewrite the following description to be highly technical, sci-fi, and cryptic. Style it like a raw system log or a HUD readout from a futuristic spacecraft. Use hex codes, technical abbreviations, and obscure jargon. Keep the meaning intact but make it sound advanced. Max 200 chars.
       
-      Current Title: ${formData.title}
-      Current Description: ${formData.description}`;
+      Input Title: ${formData.title}
+      Input Description: ${formData.description}`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: prompt,
+        config: {
+          temperature: 0.8,
+        }
       });
 
       const text = response.text;
@@ -157,11 +160,11 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                   {isGenerating ? 'PROCESSING' : 'AI::REWRITE'}
                 </button>
 
-                <div className="flex bg-white/90 border border-slate-200 focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-400/10 transition-all shadow-sm overflow-hidden group/textarea">
+                <div className="flex bg-slate-50/50 border border-slate-200 focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-400/10 transition-all shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden group/textarea backdrop-blur-sm">
                   {/* Pseudo Line Numbers with interactive state */}
-                  <div className="w-10 bg-slate-50 border-r border-slate-100 flex flex-col items-center pt-3 gap-1 select-none pointer-events-none group-focus-within/textarea:bg-cyan-50/30 transition-colors duration-300">
+                  <div className="w-10 bg-slate-100/50 border-r border-slate-200/60 flex flex-col items-center pt-3 gap-1 select-none pointer-events-none group-focus-within/textarea:bg-cyan-50/20 transition-colors duration-300">
                     {[1, 2, 3, 4, 5].map(n => (
-                      <span key={n} className="text-[7px] font-mono text-slate-300 group-focus-within/textarea:text-cyan-400/70 transition-colors">0{n}</span>
+                      <span key={n} className="text-[9px] font-mono text-slate-300 group-focus-within/textarea:text-cyan-500/70 transition-colors">0{n}</span>
                     ))}
                   </div>
                   
@@ -170,11 +173,11 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                       value={formData.description}
                       onChange={e => setFormData({ ...formData, description: e.target.value })}
                       disabled={isGenerating}
-                      className="w-full text-[11px] font-mono text-slate-600 bg-transparent px-3 py-3 outline-none resize-none h-32 leading-relaxed block placeholder:text-slate-300 disabled:opacity-50"
+                      className="w-full text-[11px] font-mono text-slate-700 bg-transparent px-3 py-3 outline-none resize-none h-32 leading-relaxed block placeholder:text-slate-300 disabled:opacity-50 caret-cyan-500 selection:bg-cyan-100 selection:text-cyan-900"
                       placeholder="Enter technical specifications..."
                     />
                     {/* Background Grid for Textarea */}
-                    <div className="absolute inset-0 pointer-events-none opacity-[0.05] bg-[radial-gradient(#94a3b8_0.5px,transparent_0.5px)] [background-size:10px_10px]" />
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(#94a3b8_0.5px,transparent_0.5px)] [background-size:10px_10px]" />
                   </div>
                 </div>
                 
