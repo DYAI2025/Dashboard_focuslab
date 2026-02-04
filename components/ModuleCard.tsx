@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ProjectModule } from '../types';
+import { GoogleGenAI } from "@google/genai";
 
 interface ModuleCardProps {
   project: ProjectModule;
@@ -10,6 +11,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [formData, setFormData] = useState<ProjectModule>(project);
 
   // Sync state with props when not editing to prevent stale data
@@ -35,6 +37,31 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
   const handleCancel = () => {
     setFormData({ ...project });
     setIsEditing(false);
+  };
+
+  const handleAiEnhance = async () => {
+    setIsGenerating(true);
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const prompt = `Rewrite the following description to be more technical, sci-fi, and cryptic, fitting a high-tech lab interface. Use jargon, abbreviations, and keeping it under 200 characters.
+      
+      Current Title: ${formData.title}
+      Current Description: ${formData.description}`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: prompt,
+      });
+
+      const text = response.text;
+      if (text) {
+        setFormData(prev => ({ ...prev, description: text.trim() }));
+      }
+    } catch (e) {
+      console.error("AI Enhance failed", e);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -117,6 +144,19 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
               
               <div className="relative">
                 <span className="absolute -top-2 left-2 px-1 bg-white text-[7px] font-mono text-cyan-600 font-bold tracking-[0.2em] z-10">DESCRIPTION_STREAM</span>
+                
+                {/* AI ENHANCE BUTTON */}
+                <button 
+                  onClick={handleAiEnhance}
+                  disabled={isGenerating}
+                  className="absolute -top-2 right-2 px-2 h-4 flex items-center gap-1 bg-cyan-50 border border-cyan-200 text-[6px] font-mono text-cyan-700 font-bold tracking-[0.2em] hover:bg-cyan-100 hover:border-cyan-400 transition-all z-20 disabled:opacity-50 cursor-pointer group/ai-btn"
+                >
+                  <svg className={`w-2 h-2 ${isGenerating ? 'animate-spin' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
+                  </svg>
+                  {isGenerating ? 'PROCESSING' : 'AI::REWRITE'}
+                </button>
+
                 <div className="flex bg-white/90 border border-slate-200 focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-400/10 transition-all shadow-sm overflow-hidden group/textarea">
                   {/* Pseudo Line Numbers with interactive state */}
                   <div className="w-10 bg-slate-50 border-r border-slate-100 flex flex-col items-center pt-3 gap-1 select-none pointer-events-none group-focus-within/textarea:bg-cyan-50/30 transition-colors duration-300">
@@ -129,7 +169,8 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                     <textarea 
                       value={formData.description}
                       onChange={e => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full text-[11px] font-mono text-slate-600 bg-transparent px-3 py-3 outline-none resize-none h-32 leading-relaxed block placeholder:text-slate-300"
+                      disabled={isGenerating}
+                      className="w-full text-[11px] font-mono text-slate-600 bg-transparent px-3 py-3 outline-none resize-none h-32 leading-relaxed block placeholder:text-slate-300 disabled:opacity-50"
                       placeholder="Enter technical specifications..."
                     />
                     {/* Background Grid for Textarea */}
@@ -137,10 +178,23 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                   </div>
                 </div>
                 
-                {/* Character Parity Monitor */}
-                <div className="mt-1 flex justify-between px-2">
-                  <span className="text-[6px] font-mono text-slate-400 uppercase tracking-widest">Parity_Check: OK</span>
-                  <span className="text-[6px] font-mono text-cyan-600 font-bold uppercase tracking-widest">Length: {formData.description.length} / 512_OCTETS</span>
+                {/* Enhanced Visual Indicator */}
+                <div className="mt-2 flex flex-col gap-1 px-1">
+                  <div className="h-0.5 w-full bg-slate-100 overflow-hidden">
+                     <div 
+                        className={`h-full transition-all duration-300 ${formData.description.length > 500 ? 'bg-red-500' : 'bg-cyan-400'}`} 
+                        style={{ width: `${Math.min(100, (formData.description.length / 512) * 100)}%` }} 
+                     />
+                  </div>
+                  <div className="flex justify-between items-center">
+                     <div className="flex items-center gap-2">
+                        <div className={`w-1 h-1 rounded-full ${formData.description.length > 0 ? 'bg-green-400 shadow-[0_0_5px_rgba(74,222,128,0.6)]' : 'bg-slate-300'}`}></div>
+                         <span className="text-[6px] font-mono text-slate-400 uppercase tracking-widest">Parity_Check: {formData.description.length > 0 ? 'OK' : 'NULL'}</span>
+                     </div>
+                     <span className={`text-[6px] font-mono font-bold uppercase tracking-widest ${formData.description.length > 500 ? 'text-red-500' : 'text-cyan-600'}`}>
+                        Length: {formData.description.length} / 512_OCTETS
+                     </span>
+                  </div>
                 </div>
               </div>
             </div>
