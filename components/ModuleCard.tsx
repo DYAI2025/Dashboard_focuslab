@@ -24,6 +24,21 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
   const isInteractionActive = isHovered || isFocused || isEditing;
   const techEasing = 'cubic-bezier(0.23, 1, 0.32, 1)';
 
+  // Laser Engraved Effect Style
+  const etchedTitleStyle = isInteractionActive ? {
+    textShadow: '1px 1px 0 rgba(255, 255, 255, 0.9), -0.5px -0.5px 0 rgba(0, 0, 0, 0.1)',
+    color: '#475569', // slate-600
+    transition: 'all 0.5s ease'
+  } : {
+    textShadow: 'none',
+    transition: 'all 0.5s ease'
+  };
+
+  const etchedIdStyle = {
+    textShadow: isInteractionActive ? '0 1px 0 rgba(255,255,255,1)' : 'none',
+    transition: 'all 0.5s ease'
+  };
+
   const handleEditToggle = () => {
     setFormData({ ...project });
     setIsEditing(true);
@@ -128,7 +143,12 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <span className="text-[10px] font-mono font-bold text-cyan-600 bg-cyan-50/80 px-2 py-0.5 border border-cyan-100/50 shadow-sm backdrop-blur-sm uppercase">MOD_{formData.id}</span>
+              <span 
+                className="text-[10px] font-mono font-bold text-cyan-600 bg-cyan-50/80 px-2 py-0.5 border border-cyan-100/50 shadow-sm backdrop-blur-sm uppercase transition-all duration-500"
+                style={etchedIdStyle}
+              >
+                MOD_{formData.id}
+              </span>
               <div className={`h-[1px] transition-all duration-700 bg-slate-200 ${isInteractionActive ? 'w-24 bg-cyan-400' : 'w-10'}`} />
             </div>
             
@@ -150,9 +170,12 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                 <input 
                   value={formData.title}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full text-2xl font-bold tracking-tighter text-slate-900 bg-white/80 border border-slate-200 px-3 py-3 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 outline-none transition-all shadow-sm placeholder:text-slate-300"
+                  className="w-full text-2xl font-bold tracking-tighter text-slate-700 bg-slate-100/30 border border-slate-200 px-3 py-3 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 outline-none transition-all shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] placeholder:text-slate-300 rounded-sm"
+                  style={etchedTitleStyle}
                   placeholder="Module Title"
                 />
+                {/* Decorative corner mark for input */}
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-400/50 pointer-events-none" />
               </div>
               
               <div className="relative">
@@ -197,29 +220,55 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                   </div>
                 </div>
                 
-                {/* Enhanced Visual Indicator */}
-                <div className="mt-2 flex flex-col gap-1 px-1">
-                  <div className="h-0.5 w-full bg-slate-100 overflow-hidden">
-                     <div 
-                        className={`h-full transition-all duration-300 ${formData.description.length > 500 ? 'bg-red-500' : 'bg-cyan-400'}`} 
-                        style={{ width: `${Math.min(100, (formData.description.length / 512) * 100)}%` }} 
-                     />
-                  </div>
-                  <div className="flex justify-between items-center">
-                     <div className="flex items-center gap-2">
-                        <div className={`w-1 h-1 rounded-full ${formData.description.length > 0 ? 'bg-green-400 shadow-[0_0_5px_rgba(74,222,128,0.6)]' : 'bg-slate-300'}`}></div>
-                         <span className="text-[6px] font-mono text-slate-400 uppercase tracking-widest">Parity_Check: {formData.description.length > 0 ? 'OK' : 'NULL'}</span>
+                {/* Advanced Diagnostic Indicator */}
+                <div className="mt-3 grid grid-cols-2 gap-2 px-1 opacity-80">
+                  {/* Buffer Usage Bar */}
+                  <div className="col-span-2 flex flex-col gap-1">
+                     <div className="flex justify-between text-[6px] font-mono text-slate-400 uppercase tracking-widest">
+                        <span>Buffer_Saturation</span>
+                        <span>{Math.round((formData.description.length / 512) * 100)}%</span>
                      </div>
-                     <span className={`text-[6px] font-mono font-bold uppercase tracking-widest ${formData.description.length > 500 ? 'text-red-500' : 'text-cyan-600'}`}>
-                        Length: {formData.description.length} / 512_OCTETS
-                     </span>
+                     <div className="h-1 w-full bg-slate-100 flex gap-0.5 overflow-hidden">
+                        {Array.from({ length: 20 }).map((_, i) => {
+                           const threshold = (i + 1) * 5; // 5%, 10%, ... 100%
+                           const current = (formData.description.length / 512) * 100;
+                           const active = current >= threshold;
+                           const color = active 
+                              ? (current > 90 ? 'bg-red-400' : 'bg-cyan-400') 
+                              : 'bg-slate-200';
+                           return (
+                              <div key={i} className={`flex-1 transition-colors duration-300 ${color}`} />
+                           );
+                        })}
+                     </div>
+                  </div>
+
+                  {/* Parity & Count */}
+                  <div className="flex items-center gap-2 border-r border-slate-100 pr-2">
+                     <div className={`w-1.5 h-1.5 rounded-sm ${formData.description.length > 0 ? 'bg-emerald-400 animate-pulse' : 'bg-slate-300'}`} />
+                     <div className="flex flex-col">
+                        <span className="text-[5px] font-mono text-slate-400 uppercase tracking-widest leading-none">PARITY_BIT</span>
+                        <span className="text-[7px] font-mono text-slate-600 font-bold uppercase tracking-widest leading-none mt-0.5">{formData.description.length > 0 ? 'VALID' : 'NULL'}</span>
+                     </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pl-2">
+                     <div className="flex flex-col items-end">
+                        <span className="text-[5px] font-mono text-slate-400 uppercase tracking-widest leading-none">OCTET_COUNT</span>
+                        <span className={`text-[7px] font-mono font-bold uppercase tracking-widest leading-none mt-0.5 ${formData.description.length > 500 ? 'text-red-500' : 'text-cyan-600'}`}>
+                           {formData.description.length.toString().padStart(3, '0')} / 512
+                        </span>
+                     </div>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
             <>
-              <h3 className="text-4xl font-light tracking-tighter text-slate-900 leading-[0.85] mb-6">
+              <h3 
+                className="text-4xl font-light tracking-tighter text-slate-900 leading-[0.85] mb-6 transition-all duration-500"
+                style={etchedTitleStyle}
+              >
                 {formData.title.split(' ').map((word, i) => (
                   <span key={i} className={i === 1 ? 'font-bold block' : 'block'}>{word}</span>
                 ))}

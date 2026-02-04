@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface LabButtonProps {
@@ -25,7 +24,7 @@ const LabButton: React.FC<LabButtonProps> = ({ label, onClick, variant = 'defaul
       
       {/* Status Light */}
       <div className="relative flex items-center justify-center w-2 h-2 shrink-0">
-        <div className={`absolute w-full h-full rounded-full ${accentColor} ${active ? 'animate-pulse scale-125 shadow-[0_0_8px_rgba(34,211,238,0.8)]' : 'opacity-40 group-hover:opacity-100 group-hover:shadow-[0_0_6px_rgba(34,211,238,0.4)]'}`} />
+        <div className={`absolute w-full h-full rounded-full ${accentColor} ${active ? 'animate-pulse scale-125 shadow-[0_0_8px_rgba(34,211,238,0.8)]' : 'opacity-40 group-hover:opacity-100 group-hover:shadow-[0_0_6px_rgba(34,211,238,0.4)] group-hover:animate-pulse'}`} />
         <div className={`w-1 h-1 bg-white rounded-full z-10 transition-transform duration-300 group-hover:scale-75`} />
       </div>
 
