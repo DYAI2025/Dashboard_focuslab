@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ProjectModule } from '../types';
 
@@ -49,7 +48,7 @@ const CoreMotif: React.FC<CoreMotifProps> = ({ projects }) => {
         <div className="scanlines absolute inset-0 pointer-events-none opacity-20" />
         
         <div className="relative z-10 flex flex-col items-center">
-          <span className="text-slate-500 font-mono text-[8px] tracking-[0.4em] mb-1 font-bold">REACTION_CHAMBER</span>
+          <span className="text-slate-500 font-mono text-[8px] tracking-[0.4em] mb-1 font-bold">DYAI</span>
           <div className={`w-20 h-[1px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent mb-3 transition-opacity duration-1000 ${activationRatio > 0.3 ? 'opacity-100' : 'opacity-30'}`} />
           
           {/* Animated Bars - Synchronized with current projects state */}

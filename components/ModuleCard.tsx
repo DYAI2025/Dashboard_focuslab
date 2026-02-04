@@ -70,20 +70,30 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (isEditing) return;
     if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      setIsHovered(!isHovered);
+      // If focusing the main card, allow toggling visual state if desired, 
+      // but primary interaction is via focus expansion.
+      // Prevent default scrolling for Space
+      if ((e.target as HTMLElement) === e.currentTarget) {
+         e.preventDefault();
+      }
     }
   };
 
   return (
     <div 
+      tabIndex={0}
       role="region"
       aria-label={`Project Module: ${formData.title}`}
-      className={`group relative h-[36rem] overflow-hidden panel-lab transition-all duration-700 border-r border-b border-slate-200/60 focus-within:ring-2 focus-within:ring-cyan-400/30`}
+      className={`group relative h-[36rem] overflow-hidden panel-lab transition-all duration-700 border-r border-b border-slate-200/60 outline-none focus:ring-1 focus:ring-cyan-400 focus:bg-slate-50 focus-within:ring-2 focus-within:ring-cyan-400/30`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => !isEditing && setIsHovered(false)}
       onFocus={() => setIsFocused(true)}
-      onBlur={() => setIsFocused(false)}
+      onBlur={(e) => {
+        // Prevent state flicker when moving focus between children or container
+        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+          setIsFocused(false);
+        }
+      }}
       onKeyDown={handleKeyDown}
       style={{ willChange: 'transform, box-shadow' }}
     >
@@ -125,9 +135,9 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
             {!isEditing && (
               <button 
                 onClick={handleEditToggle}
-                className="flex items-center gap-2 px-3 py-1 glass-panel border border-slate-200 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-600 hover:border-cyan-400 transition-all opacity-0 group-hover:opacity-100"
+                className="flex items-center gap-2 px-3 py-1 glass-panel border border-slate-200 text-[8px] font-mono font-bold text-slate-500 hover:text-cyan-600 hover:border-cyan-400 transition-all opacity-0 group-hover:opacity-100 group-focus:opacity-100 focus:opacity-100"
               >
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 EDIT_MODE
               </button>
             )}
@@ -160,11 +170,11 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                   {isGenerating ? 'PROCESSING' : 'AI::REWRITE'}
                 </button>
 
-                <div className="flex bg-slate-50/50 border border-slate-200 focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-400/10 transition-all shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] overflow-hidden group/textarea backdrop-blur-sm">
+                <div className="group/textarea relative flex bg-slate-50/30 border border-slate-200 hover:border-slate-300 focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-400/10 transition-all shadow-inner overflow-hidden backdrop-blur-sm rounded-sm">
                   {/* Pseudo Line Numbers with interactive state */}
-                  <div className="w-10 bg-slate-100/50 border-r border-slate-200/60 flex flex-col items-center pt-3 gap-1 select-none pointer-events-none group-focus-within/textarea:bg-cyan-50/20 transition-colors duration-300">
+                  <div className="w-8 bg-slate-100/50 border-r border-slate-200/50 flex flex-col items-end pr-2 pt-3 gap-1 select-none pointer-events-none group-focus-within/textarea:bg-cyan-50/10 transition-colors duration-300">
                     {[1, 2, 3, 4, 5].map(n => (
-                      <span key={n} className="text-[9px] font-mono text-slate-300 group-focus-within/textarea:text-cyan-500/70 transition-colors">0{n}</span>
+                      <span key={n} className="text-[9px] font-mono text-slate-300 group-focus-within/textarea:text-cyan-600/70 transition-colors">0{n}</span>
                     ))}
                   </div>
                   
@@ -173,11 +183,17 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                       value={formData.description}
                       onChange={e => setFormData({ ...formData, description: e.target.value })}
                       disabled={isGenerating}
-                      className="w-full text-[11px] font-mono text-slate-700 bg-transparent px-3 py-3 outline-none resize-none h-32 leading-relaxed block placeholder:text-slate-300 disabled:opacity-50 caret-cyan-500 selection:bg-cyan-100 selection:text-cyan-900"
+                      className="peer w-full text-[11px] font-mono text-slate-700 bg-transparent px-3 py-3 outline-none resize-none h-32 leading-relaxed block placeholder:text-slate-300 disabled:opacity-50 caret-cyan-500 selection:bg-cyan-100 selection:text-cyan-900"
                       placeholder="Enter technical specifications..."
+                      spellCheck={false}
                     />
-                    {/* Background Grid for Textarea */}
-                    <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(#94a3b8_0.5px,transparent_0.5px)] [background-size:10px_10px]" />
+                    
+                    {/* Background Grid for Textarea - Enhanced */}
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.03] peer-focus:opacity-10 transition-opacity duration-500 bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[size:10px_10px]" />
+                    
+                    {/* Focus Corner Accents */}
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyan-400 opacity-0 peer-focus:opacity-100 transition-all duration-300" />
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-400 opacity-0 peer-focus:opacity-100 transition-all duration-300" />
                   </div>
                 </div>
                 
