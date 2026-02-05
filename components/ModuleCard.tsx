@@ -26,16 +26,21 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
 
   // Laser Engraved Effect Style
   const etchedTitleStyle = isInteractionActive ? {
-    textShadow: '1px 1px 0 rgba(255, 255, 255, 0.9), -0.5px -0.5px 0 rgba(0, 0, 0, 0.1)',
-    color: '#475569', // slate-600
-    transition: 'all 0.5s ease'
+    // Active: Deep etch with simulated inner shadow via negative offsets
+    textShadow: '1px 1px 1px rgba(255, 255, 255, 0.9), -1px -1px 1px rgba(0, 0, 0, 0.1)',
+    color: 'rgba(51, 65, 85, 0.9)', // slate-700 slightly transparent to blend like burnt material
+    transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)'
   } : {
-    textShadow: 'none',
-    transition: 'all 0.5s ease'
+    // Inactive: Subtle surface print with minimal depth
+    textShadow: '0 1px 0 rgba(255, 255, 255, 0.4)',
+    color: '#0f172a', // slate-900
+    transition: 'all 0.5s cubic-bezier(0.23, 1, 0.32, 1)'
   };
 
   const etchedIdStyle = {
-    textShadow: isInteractionActive ? '0 1px 0 rgba(255,255,255,1)' : 'none',
+    textShadow: isInteractionActive 
+      ? '1px 1px 0 rgba(255,255,255,1), -0.5px -0.5px 0 rgba(0,0,0,0.1)' 
+      : '0 1px 0 rgba(255,255,255,0.2)',
     transition: 'all 0.5s ease'
   };
 
@@ -170,7 +175,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
                 <input 
                   value={formData.title}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full text-2xl font-bold tracking-tighter text-slate-700 bg-slate-100/30 border border-slate-200 px-3 py-3 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 outline-none transition-all shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] placeholder:text-slate-300 rounded-sm"
+                  className="w-full text-2xl font-bold tracking-tighter bg-slate-100/30 border border-slate-200 px-3 py-3 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 outline-none transition-all shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)] placeholder:text-slate-300 rounded-sm"
                   style={etchedTitleStyle}
                   placeholder="Module Title"
                 />
