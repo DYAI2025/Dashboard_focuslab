@@ -12,7 +12,7 @@
     <style>
       @layer base {
         body {
-          @apply antialiased bg-[#FDFDFD] text-slate-800 overflow-x-hidden;
+          @apply antialiased bg-[#020617] text-slate-300 overflow-x-hidden;
           font-family: 'Outfit', sans-serif;
         }
         .font-mono {
@@ -20,21 +20,22 @@
         }
       }
 
-      /* Polished Lab Materials */
+      /* Polished Lab Materials - Dark Metallic */
       .panel-lab {
-        background: linear-gradient(165deg, #ffffff 0%, #f0f4f8 100%);
-        border: 1px solid rgba(200, 210, 220, 0.5);
+        background: linear-gradient(165deg, #1e293b 0%, #0f172a 100%); /* Slate-800 to Slate-900 */
+        border: 1px solid rgba(34, 211, 238, 0.3); /* Cyan-400 at 30% */
         box-shadow: 
-          inset 0 1px 2px rgba(255, 255, 255, 1),
-          0 10px 30px -10px rgba(0, 0, 0, 0.08);
+          inset 0 1px 0 rgba(255, 255, 255, 0.05),
+          0 10px 40px -10px rgba(0, 0, 0, 0.5),
+          0 0 15px rgba(34, 211, 238, 0.05); /* Subtle blue glow */
         position: relative;
       }
 
       .glass-panel {
-        background: rgba(255, 255, 255, 0.6);
+        background: rgba(2, 6, 23, 0.7); /* Slate-950 */
         backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        box-shadow: inset 0 0 15px rgba(34, 211, 238, 0.05);
+        border: 1px solid rgba(34, 211, 238, 0.2);
+        box-shadow: inset 0 0 20px rgba(34, 211, 238, 0.03);
       }
 
       /* Vertical Text Utility */
@@ -66,22 +67,22 @@
 
       @keyframes glitch-text {
         0% { transform: translate(0); text-shadow: none; }
-        20% { transform: translate(-1px, 1px); text-shadow: 2px 0 rgba(34,211,238,0.4), -2px 0 rgba(244,63,94,0.4); }
-        40% { transform: translate(1px, -1px); text-shadow: -2px 0 rgba(34,211,238,0.4), 2px 0 rgba(244,63,94,0.4); }
+        20% { transform: translate(-1px, 1px); text-shadow: 2px 0 rgba(34,211,238,0.4), -2px 0 rgba(245,158,11,0.4); }
+        40% { transform: translate(1px, -1px); text-shadow: -2px 0 rgba(34,211,238,0.4), 2px 0 rgba(245,158,11,0.4); }
         60% { transform: translate(0); text-shadow: none; }
-        80% { transform: translate(1px, 1px); text-shadow: 2px 0 rgba(34,211,238,0.4), -2px 0 rgba(244,63,94,0.4); }
+        80% { transform: translate(1px, 1px); text-shadow: 2px 0 rgba(34,211,238,0.4), -2px 0 rgba(245,158,11,0.4); }
         100% { transform: translate(0); text-shadow: none; }
       }
 
       @keyframes flare-drift {
-        0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-        50% { transform: translate(100px, 50px) scale(1.2); opacity: 0.6; }
+        0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+        50% { transform: translate(100px, 50px) scale(1.2); opacity: 0.4; }
       }
       .lens-flare {
         position: fixed;
         width: 600px;
         height: 600px;
-        background: radial-gradient(circle, rgba(34, 211, 238, 0.15) 0%, rgba(34, 211, 238, 0) 70%);
+        background: radial-gradient(circle, rgba(34, 211, 238, 0.1) 0%, rgba(34, 211, 238, 0) 70%);
         pointer-events: none;
         z-index: 1;
         mix-blend-mode: screen;
@@ -97,10 +98,10 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-        background-size: 100% 2px, 3px 100%;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+        background-size: 100% 3px, 3px 100%;
         pointer-events: none;
-        opacity: 0.3;
+        opacity: 0.15;
       }
 
       /* Schematic Utilities */
@@ -110,8 +111,9 @@
 
       /* Custom scrollbar */
       ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: #f8fafc; }
-      ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+      ::-webkit-scrollbar-track { background: #020617; }
+      ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: #0ea5e9; }
     </style>
     <script type="importmap">
 {
@@ -128,3 +130,4 @@
     <div id="root"></div>
   </body>
 </html>
+    
