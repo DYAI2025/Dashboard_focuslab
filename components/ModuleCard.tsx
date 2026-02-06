@@ -47,18 +47,20 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
     transition: 'all 0.5s ease'
   };
 
-  const handleEditToggle = () => {
-    setFormData({ ...project });
-    setIsEditing(true);
+  const handleToggleEdit = () => {
+    if (isEditing) {
+      // Cancel edit
+      setFormData({ ...project });
+      setIsEditing(false);
+    } else {
+      // Start edit
+      setFormData({ ...project });
+      setIsEditing(true);
+    }
   };
 
   const handleSave = () => {
     onUpdate(formData);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setFormData({ ...project });
     setIsEditing(false);
   };
 
@@ -110,7 +112,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
       tabIndex={0}
       role="region"
       aria-label={`Project Module: ${formData.title}`}
-      className={`group relative h-[36rem] overflow-hidden panel-lab transition-all duration-700 border-r border-b border-cyan-500/20 outline-none focus:ring-1 focus:ring-amber-400 focus:bg-slate-900 focus-within:ring-2 focus-within:ring-amber-400/30`}
+      className={`group relative h-[36rem] overflow-hidden panel-lab transition-all duration-700 border-r border-b border-cyan-500/20 outline-none focus:ring-1 focus:ring-amber-400/60 focus:border-amber-400/50 focus:bg-slate-900 focus:shadow-[0_0_25px_rgba(245,158,11,0.15)] focus-within:ring-2 focus-within:ring-amber-400/30`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => !isEditing && setIsHovered(false)}
       onFocus={() => setIsFocused(true)}
@@ -163,15 +165,26 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
               <div className={`h-[1px] transition-all duration-700 bg-slate-700 ${isInteractionActive ? 'w-24 bg-amber-500' : 'w-10'}`} />
             </div>
             
-            {!isEditing && (
-              <button 
-                onClick={handleEditToggle}
-                className="flex items-center gap-2 px-3 py-1 glass-panel border border-slate-700 text-[8px] font-mono font-bold text-slate-500 hover:text-amber-400 hover:border-amber-400 transition-all opacity-0 group-hover:opacity-100 group-focus:opacity-100 focus:opacity-100"
-              >
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                EDIT_MODE
-              </button>
-            )}
+            <button 
+              onClick={handleToggleEdit}
+              className={`flex items-center gap-2 px-3 py-1 glass-panel border text-[8px] font-mono font-bold transition-all z-50 cursor-pointer ${
+                isEditing 
+                  ? 'border-amber-500 text-amber-500 bg-amber-500/10 shadow-[0_0_10px_rgba(245,158,11,0.2)]' 
+                  : 'border-slate-700 text-slate-500 hover:text-amber-400 hover:border-amber-400 opacity-70 hover:opacity-100'
+              }`}
+            >
+              {isEditing ? (
+                <>
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                  EXIT_MODE
+                </>
+              ) : (
+                <>
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  EDIT_MODE
+                </>
+              )}
+            </button>
           </div>
           
           {isEditing ? (
@@ -423,7 +436,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({ project, onUpdate }) => {
               {isEditing ? (
                 <>
                   <button onClick={handleSave} className="flex-1 py-3 bg-amber-600 text-white text-[10px] font-mono font-bold tracking-[0.4em] hover:bg-amber-700 transition-all shadow-[0_0_15px_rgba(245,158,11,0.2)]">COMMIT_CHANGES</button>
-                  <button onClick={handleCancel} className="flex-1 py-3 bg-slate-800 text-slate-400 text-[10px] font-mono font-bold tracking-[0.4em] hover:bg-slate-700 transition-all">ABORT_SYNC</button>
+                  <button onClick={handleToggleEdit} className="flex-1 py-3 bg-slate-800 text-slate-400 text-[10px] font-mono font-bold tracking-[0.4em] hover:bg-slate-700 transition-all">ABORT_SYNC</button>
                 </>
               ) : (
                 <>
